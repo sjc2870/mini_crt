@@ -57,8 +57,9 @@ void *malloc(int size){
         //printf("error:heap space has been used up\n");
         return NULL;
     }
+    header *found;
     if(free_head->size >= (size+HEADER_SIZE)){
-        header *found = free_head;
+        found = free_head;
         header *next = ((char*)free_head)+size+HEADER_SIZE;
         next->prev = free_head->prev;
         next->next = free_head->next;
@@ -80,12 +81,11 @@ void *malloc(int size){
         }
         used_list = found;
     }
-    return(void*)((char*)found + HEADER_SIZE);
+    return(void*)((char*)found+ HEADER_SIZE);
 }
 
 /* @brief:  1. move block that will be freed to free_list
 */
 void free(void *addr){
-    header *head = (header*)(addr-HEADER_SIZE);
-
+    header *head = (header*)((char*)addr-HEADER_SIZE);
 }
