@@ -70,7 +70,7 @@ int seek(int fd, int offset, int mode){
 int fopen(const char *pathname, const char *mode){
     int fd = -1;
     int flags = 0;
-    int mode = 0;
+    int access = 0;
 
 // from fcntl.h
 #define O_RDONLY 00
@@ -79,9 +79,22 @@ int fopen(const char *pathname, const char *mode){
 #define O_CREAT 0100
 #define O_TRUNC 01000
 #define O_APPEND 02000
+
     if(strcmp(mode,"w") == 0){
-        mode = mode | O_WRONLY | O_CREAT | 
+        access = access | O_WRONLY | O_CREAT | O_TRUNC;
     }
+    if(strcmp(mode, "w+") == 0){
+        access = access | O_RDWR | O_CREAT | O_TRUNC;
+    }
+    if(strcmp(mode, "r") == 0){
+        access = access | O_RDONLY;
+    }
+    if(strcmp(mode, "r+") == 0){
+        access = access | O_RDWR | O_CREAT;
+    }
+
+    fd = open(pathname, flags, access);
+    return  fd;
 }
 
 int fclose(FILE *fp){
@@ -90,8 +103,8 @@ int fclose(FILE *fp){
 int fread(void *ptr, size_t size, size_t nmemb, FILE *stream){
     return read((int)stream, ptr, size*nmemb);
 }
-int fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream){
-    return read((int)stream, ptr, size*nmemb);
+size_t fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream){
+    return write((int)stream, ptr, size*nmemb);
 }
 int fseek(FILE *fp, int offset, int set){
     return seek((int)fp, offset, set);
